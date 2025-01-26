@@ -1,0 +1,315 @@
+<html lang="en"><head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>GPSandTrack Login</title>
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
+        <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="assets/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="assets/css/style.css?r=1">
+        <link rel="stylesheet" href="assets/css/banner.css?r=1">
+
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <!-- Favicon and touch icons -->
+
+        <!--[if lt IE 10]>
+            <script src="assets/js/placeholder.js"></script>
+        <![endif]-->
+        <!-- Javascript -->
+        <script src="assets/js/jquery-1.11.1.min.js"></script>
+        <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+        <script src="assets/js/jquery.backstretch.min.js"></script>
+        <script src="assets/js/scripts.js"></script>
+        <script src="assets/js/jquery.redirect.min.js"></script>
+<script>
+
+var websiteurl="https://www.gpsandfleet3.net/gpsandfleet/";
+var url="https://www.gpsandfleet3.net/gpsandfleet/";
+var ipAddress="152.58.177.50";
+var page="http://www.gpsandfleet.io/gpsandfleet/client_login.php?r=2048";
+var useragent ="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+var remotehost ="152.58.177.50";
+
+
+  </script>
+
+<script>
+function checkValidSession(){
+
+
+		    $.ajax({
+                    	dataType: "json",
+                    	method : "GET",
+		    	xhrFields: {
+		     	withCredentials: true
+		    	},
+		    	url : websiteurl+"checkValidSession.php"
+		    	}).done(function(data) {
+         			if(data.isSessionValid){
+				   window.location.href=websiteurl+data.url;
+				}
+
+      		  	}).error(function(){ 
+			   window.location.href="/gpsandfleet/checkserver.php?refresh";
+			});
+
+}
+
+$(function(){
+
+
+checkValidSession();
+
+function loginAction() {
+ $.ajax({
+                    	dataType: "json",
+                    	method : "POST",
+			data:{url:url,username:$("#username").val(),password:$("#password").val()},
+		    	xhrFields: {
+		     	withCredentials: true
+		    	},
+		    	//url : url+"EnableLogin.php"
+		    	url : "./EnableLogin.php"
+		    	}).done(function(data) {
+         			if(data.isSessionValid){
+				   $(".err").hide();
+				  if(data.isSessionValid){
+				   //window.location.href=websiteurl+data.url;
+				   UpdateLoginLog(url);
+				}
+
+                                           
+			}else{
+				$(".err").show();
+				}
+
+      		  	}).error(function(){ 
+			   window.location.href="/gpsandfleet/checkserver.php?refresh";
+			});
+}
+
+
+
+//Login Button Click
+
+$(document).on('click','.bt_login',function(){
+	loginAction();
+});
+
+ //Enter keypress
+
+$(document).on('keypress', function(e) {
+  if (e.which === 13) {
+    loginAction();
+    e.preventDefault();
+  }
+});
+
+
+});
+
+function UpdateLoginLog(dataUrl){
+
+$.ajax({
+                    	dataType: "html",
+                    	method : "POST",
+			data:{username:$("#username").val(),ipadd:ipAddress,page:page,remotehost:remotehost},
+		    	url : "pageLoginLog.php"
+		    	}).done(function(data) {
+         			
+			   //mixpanel.track("Login");
+			   //window.location.href= websiteUrl+url;
+
+			   $.redirect(url+'EnableLogin_CORS.php', {
+                     			username: $("#username").val(),
+                    			password: $("#password").val(),
+								querystring:getQueryStringParameter('summary')
+		                });
+				
+
+      		  	}).error(function(){ 
+			   window.location.href="https://www.gpsandfleet.io/gpsandfleet/checkserver.php?refresh";
+			});
+
+
+}
+ function getQueryStringParameter(name) {
+        let urlParams = new URLSearchParams(window.location.search);
+		
+        return urlParams.get(name);
+    }
+
+    // Check for the 'summary' query string on page load
+   
+
+
+//Change password
+
+		$(document).on('click','.aForgotPwd', function () {
+			$('#divChangePwd').modal('show');
+		});
+
+		$(document).on('click','#btnResetPassword',function(){
+			$("#pChangePwdResult").html('');
+			if(validateEmail($("#divChangePwd #txtEmail").val())){
+			$.ajax({
+				dataType: "json",
+				method : "POST",
+				data:{Contact_old:$("#divChangePwd #txtEmail").val(),username:$("#divChangePwd #txtUsername").val()},
+					xhrFields: {
+					withCredentials: true
+					},
+					url : url+"passwordreset2.php",
+					success:function(data) {
+					$("#pChangePwdResult").html('Please check your email for reset link.').show();
+					$('#btnResetPassword').html("RESEND");
+					}
+			});
+			}else{
+			$("#pChangePwdResult").attr('style','display:block').html('Enter a valid email address');
+			}
+			
+		});
+
+
+$( document ).ready(function() {
+       
+		$.ajax({
+				dataType: "json",
+				method : "POST",
+				url : "/gpsandfleet/msgFromAdmin.php",
+					success:function(result) {
+					 if(result[0].status == "Enable")
+					 {
+                      $(".top-content").prepend('<div class="banner"> <div class="banner__content"><div class="banner__text">  <strong>'+result[0].message+'</strong> </div><div class="banner__close"> <span class="material-icons" id="closemsg">close</span> </div> </button></div></div>');
+                     }
+					 }
+			});
+			
+  });
+$(document).on('click','#closemsg',function(){
+	$('.banner').hide();
+
+
+    });
+
+   $('.banner__close').on('click',function(){ 
+    $(".banner").hide();	
+  });
+		function validateEmail(email) 
+		{ 
+		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/ 
+		return email.match(re) ; 
+		}
+</script> 
+
+    </head>
+
+    <body>
+
+
+        <!-- Top content -->
+        <div class="top-content">
+        	
+            <div class="inner-bg">
+                <div class="container-fluid wrapper">
+                   <!-- <div class="wrap">
+
+				<header> 
+				  <div class="col-lg-5 col-lg-offset-1 col-xs-6 col-md-offset-0 headerCol" style="">
+				  </div>
+				  <div class="col-lg-5 col-xs-6  headerCol">
+					<div class="pull-right" style="margin-top: 3px;"><label>Sales: 800-578-1809</label><label style="margin-left: 25px;">Tech Support: </label><a style="font-weight: 500; color: darkblue; margin-left: 6px;" href="mailto:support@gpsandfleet.com" >support@gpsandfleet.com</a></div>
+				  </div>
+				</header>
+		</div>-->
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3 form-box">
+                        	<div class="form-top">
+				<div class="form-top-left">
+                        			<img class="gpsandtracklogo" src="images/Gps-Track-Logo-360-120.jpg">
+                        		</div>
+                        		<div class="form-top-right">
+                        			<!-- <i class="fa fa-lock"></i> -->
+                        			<p>Fleet Login</p>
+                        		</div>
+                            </div>
+                            <div class="form-body">
+
+			                    	<div class="form-group">
+			                           	<input type="text" name="form-username" placeholder="username" class="form-username form-input" id="username"><br><br>
+			                        </div>
+			                        <div class="form-group">
+			                           	<input type="password" name="form-password" placeholder="password" class="form-password form-input" id="password">
+			                        </div><br>
+				           <div class="form-label-group" style="margin-bottom: 1rem;">
+				               <label class="err">Username or password invalid</label>
+				            </div>
+									<div class="buttons">
+									<div class="submit bt_login"><a class="bt_login_txt">Submit</a></div><br>
+									<div class="forgot-pwd"><a href="#inline_content" class="inline cboxElement aForgotPwd">Forgot Password</a></div>
+									</div>
+		                    </div>
+							<div class="form-bottom">
+							<div>
+				<div class="" style="">
+				  </div>
+				  <div class="">
+					<div class="support" style="padding-top: 5px;"><label>Sales: 800-578-1809</label><span style="margin-left:15px;margin-right:15px;font-size:20px">|</span><label style="margin-left: 0px;">Tech Support: </label><a style="font-weight:400;color:black;margin-left: 5px;" href="mailto:support@gpsandfleet.com">support@gpsandfleet.com</a></div>
+				  </div>
+				</div>
+                        		
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+		<!-- Modal -->
+		<div id="divChangePwd" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Reset Password</h4>
+						<button type="button" class="close" data-dismiss="modal">×</button>
+					</div>
+					<div class="modal-body">
+						<p>Enter your Username and the Email Address you registered with, and we will send you a new password.</p>
+						<div class="form-group">
+							<label for="pwd">Username </label>
+							<input type="text" class="form-control" id="txtUsername">
+						</div>
+						<div class="form-group">
+							<label for="pwd">Email address </label>
+							<input type="email" class="form-control" id="txtEmail">
+						</div>
+						<div class="form-group">
+							<p style="display:none;color:red;font-weight:bold;" id="pChangePwdResult"></p>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button id="btnResetPassword" type="button" class="btn btn-default">Send</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+    
+
+<div class="backstretch" style="left: 0px; top: 0px; overflow: hidden; margin: 0px; padding: 0px; height: 678px; width: 1519px; z-index: -999999; position: fixed;"><img src="assets/img/backgrounds/geosatellite.jpg" style="position: absolute; margin: 0px; padding: 0px; border: none; width: 1519px; height: 1012.67px; max-height: none; max-width: none; z-index: -999999; left: 0px; top: -167.333px;"></div></body></html>

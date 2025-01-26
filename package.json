@@ -1,0 +1,19 @@
+{
+  "name": "selenium",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --timeout 60000"
+  },
+  "dependencies": {
+    "chai": "^5.1.2",
+    "chromedriver": "^132.0.1",
+    "geckodriver": "^5.0.0",
+    "mocha": "^10.2.0",
+    "selenium-webdriver": "^4.28.1"
+  }
+}
