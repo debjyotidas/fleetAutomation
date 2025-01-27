@@ -1,4 +1,5 @@
-const { Builder, By, Key, until } = require('selenium-webdriver');
+import { Builder, By } from "selenium-webdriver";
+import { expect } from "chai";
 
 (async function example() {
     // Set up the WebDriver (use "chrome" or "firefox" as per your preference)
